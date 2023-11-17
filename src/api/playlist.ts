@@ -1,10 +1,8 @@
-import { terminal } from 'virtual:terminal';
 export async function getGenres(): Promise<Array<string>> {
-	const accessToken = localStorage.getItem('access_token');
+	const accessToken = sessionStorage.getItem('access_token');
 	const genres: Array<string> = JSON.parse(localStorage.getItem('genres')!);
 	if (genres)
 		return genres;
-	terminal.log('getting genres from server!')
 	const result = await fetch('https://api.spotify.com/v1/recommendations/available-genre-seeds', {
         method: 'GET',
 		headers: {
@@ -17,7 +15,7 @@ export async function getGenres(): Promise<Array<string>> {
 }
 
 export async function getSongs(genre: string, trackCount: number, profile: any) {
-	const accessToken = localStorage.getItem('access_token');
+	const accessToken = sessionStorage.getItem('access_token');
 	const result = await fetch(`https://api.spotify.com/v1/recommendations?limit=${trackCount}&market=${profile.country}&seed_genres=${genre}`, {
         method: 'GET',
 		headers: {
@@ -26,7 +24,6 @@ export async function getSongs(genre: string, trackCount: number, profile: any) 
 	}).then(response => response.json()).then(data => {return data.tracks});
 	const uris: string[] = [];
 	result.forEach((track: any) => {uris.push(track.uri)});
-	terminal.log(uris);
 
 	const playlistId = await makePlaylist(profile);
 
@@ -46,8 +43,7 @@ export async function getSongs(genre: string, trackCount: number, profile: any) 
 
 async function makePlaylist(profile: any) {
     const id = profile.id
-    const access_token = localStorage.getItem('access_token');
-    terminal.log(id)
+    const access_token = sessionStorage.getItem('access_token');
     const result = await fetch(`https://api.spotify.com/v1/users/${id}/playlists`,
     {
         method: "POST",

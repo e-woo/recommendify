@@ -52,7 +52,7 @@ export async function getAccessToken(clientId: string, code: string) {
     });
     const response = await result.json();
     terminal.log(response);
-    localStorage.setItem('access_token', response.access_token);
+    sessionStorage.setItem('access_token', response.access_token);
     localStorage.setItem('refresh_token', response.refresh_token);
 }
 
@@ -72,19 +72,25 @@ export async function getRefreshToken(clientId: string) {
         body: params,
     });
     const response = await result.json();
-    localStorage.setItem('access_token', response.access_token);
+    sessionStorage.setItem('access_token', response.access_token);
     localStorage.setItem('refresh_token', response.refresh_token);
    }
 
 
-export async function fetchProfile(): Promise<any> {
-    const access_token = localStorage.getItem('access_token');
-    const result = await fetch("https://api.spotify.com/v1/me",
+export async function fetchProfile(): Promise<Object> {
+    if (localStorage.getItem('profile') !== null) {
+        const localProfile = JSON.parse(localStorage.getItem('profile')!);
+        if (!('error' in localProfile)) {
+            return localProfile;
+        }
+    }
+    const accessToken = sessionStorage.getItem('access_token');
+    const result = await fetch('https://api.spotify.com/v1/me',
         {
             method: "GET",
-            headers: { 'Authorization': `Bearer ${access_token}` }
+            headers: { 'Authorization': `Bearer ${accessToken}` }
         }
     ).then(response => response.json()).then(data => {return data});
-    terminal.log(result);
+    localStorage.setItem('profile', JSON.stringify(result));
     return result;
 }
