@@ -22,7 +22,12 @@
     "types": [
       "vite-plugin-terminal/client"
     ],
+    "esModuleInterop": true,
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "ts-node": {
+    // Tell ts-node CLI to install the --loader automatically
+    "esm": true
+}
 }

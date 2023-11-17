@@ -1,25 +1,24 @@
 import { useEffect, useState } from 'react';
-import { terminal } from 'virtual:terminal';
 import './App.css';
-import { fetchProfile, getAccessToken, getRefreshToken, makePlaylist, redirectToAuthCodeFlow } from './auth';
+import { fetchProfile, getAccessToken, getRefreshToken, redirectToAuthCodeFlow } from './api/auth';
+import { getGenres, getSongs } from './api/playlist';
 const App = () => {
-	const clientId = 'ENTER CLIENT ID';
+	const clientId = '';
 	const params = new URLSearchParams(window.location.search);
 	const code = params.get("code");
 	
+	const [trackCount, setTrackCount] = useState(50);
 	const [profile, setProfile] = useState({});
-	
+	const [genres, setGenres] = useState<string[]>([]);
 	useEffect(() => {
 		async function f() {
 			if (code) {
-				terminal.log('Refresh token: ' + localStorage.getItem('refresh_token'))
 				if (localStorage.getItem('refresh_token') !== 'undefined' && localStorage.getItem('refresh_token'))
 					await getRefreshToken(clientId);
 				else
 					await getAccessToken(clientId, code);
 				
 			}
-			terminal.log('called once!')
 		}
 		f();
 	}, []);
@@ -27,6 +26,7 @@ const App = () => {
 	useEffect(() => {
 		async function f() {
 			setProfile(await fetchProfile());
+			setGenres(await getGenres());
 		}
 		f();
 	}, []);
@@ -35,10 +35,14 @@ const App = () => {
 		<div>
 			page
 			{code ? <>
-				<button onClick={() => {
-				terminal.log(makePlaylist(profile))}}>Create playlist</button>
+					<select id='category'>
+						{genres.map((item, index) => <option value={item} key={index}>{capitalize(item)}</option>)}
+					</select>
+					<input type='range' min={5} max={100} defaultValue={trackCount} id='count' step={5} onChange={e => setTrackCount(e.target.valueAsNumber)}></input>
+					<p>{trackCount}</p>
+					<button onClick={() => getSongs((document.getElementById('category')! as HTMLFormElement).value, trackCount, profile)}>Get songs</button>
 				<button onClick={() => {document.location = 'http://localhost:3000'}}>Logout</button> 
-				<p>{getProfileName(profile)}</p>
+				<p>{getProfileEmail(profile)}</p>
 			</> :
 			<button onClick={() => redirectToAuthCodeFlow(clientId)}>Login</button>
             }
@@ -46,7 +50,12 @@ const App = () => {
     );
 };
 
-export default App;
-function getProfileName(profile: any) {
+function getProfileEmail(profile: any) {
 	return profile.email;
 }
+
+function capitalize(str: string) {
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export default App;

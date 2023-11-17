@@ -1,4 +1,3 @@
-
 import { terminal } from 'virtual:terminal';
 export async function redirectToAuthCodeFlow(clientId: string) {
     const verifier = generateCodeVerifier(128);
@@ -9,7 +8,7 @@ export async function redirectToAuthCodeFlow(clientId: string) {
     params.append("client_id", clientId);
     params.append("response_type", "code");
     params.append("redirect_uri", "http://localhost:3000");
-    params.append("scope", "user-read-private user-read-email playlist-modify-public playlist-modify-private");
+    params.append("scope", "user-read-private user-read-email playlist-modify-public playlist-modify-private user-top-read");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", challenge);
 
@@ -85,26 +84,7 @@ export async function fetchProfile(): Promise<any> {
             method: "GET",
             headers: { 'Authorization': `Bearer ${access_token}` }
         }
-    );
-    return await result.json();
-}
-
-export async function makePlaylist(profile: any) {
-    const id = profile.id
-    const access_token = localStorage.getItem('access_token');
-    terminal.log(id)
-    const result = await fetch(`https://api.spotify.com/v1/users/${id}/playlists`,
-    {
-        method: "POST",
-        headers: { 
-            'Authorization': `Bearer ${access_token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'name': 'abc',
-            'description': 'New playlist description',
-            'public': false
-        })
-    });
-    return await result.json();
+    ).then(response => response.json()).then(data => {return data});
+    terminal.log(result);
+    return result;
 }
