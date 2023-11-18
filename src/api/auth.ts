@@ -57,7 +57,6 @@ export async function getAccessToken(clientId: string, code: string) {
 }
 
 export async function getRefreshToken(clientId: string) {
-    terminal.log('Getting refresh token!')
 
     // refresh token that has been previously stored
     const refreshToken = localStorage.getItem('refresh_token');

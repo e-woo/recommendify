@@ -9,7 +9,7 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				'openSans': ['Open Sans', 'Nunito', ...defaultTheme.fontFamily.sans],
+				'poppins': ['Poppins', ...defaultTheme.fontFamily.sans],
 			},
 			colors: {
 				...colors,
