@@ -22,21 +22,35 @@ const App = () => {
 	
 	useEffect(() => {
 		async function authorize() {
-			// initial authorization to obtain an Access Token via PKCE Authorization
+			const refreshToken = localStorage.getItem('refresh_token')
+
+			// initial authorization to obtain an Access Token via PKCE Authorization (code in URL)
 			if (code) {
 				await getAccessToken(clientId, code);
 				setLoggedIn(true);
 				document.location = 'http://localhost:3000'
 			}
-			else if (loggedIn && localStorage.getItem('refresh_token') !== null) // intended for page refreshes
-				getRefreshToken(clientId);
-			// fetch an existing access token from session storage
-			if (sessionStorage.getItem('access_token') !== null) 
-				setLoggedIn(true)
+
+			// if refresh token is bad, the user will need to reauthorize, so clear local storage
+			else if (refreshToken === 'undefined' || refreshToken === null) {
+				setLoggedIn(false);
+				localStorage.removeItem('profile');
+				localStorage.removeItem('refresh_token');
+				localStorage.removeItem('verifier');
+				sessionStorage.removeItem('access_token')
 			}
+
+			// get refresh token
+			else
+				getRefreshToken(clientId);
+
+			// fetch an existing access token from session storage
+			if (sessionStorage.getItem('access_token') !== null)
+				setLoggedIn(true);
+		}
 		authorize();
 	}, []);
-
+	
 	useEffect(() => {
 		async function f() {
 			// fetch profile and genres when logged in
@@ -45,7 +59,7 @@ const App = () => {
 				setGenres(await getGenres());
 			}
 			// load profile from local storage
-			else if (localStorage.getItem('profile') !== null)
+			else if (!('error' in JSON.parse(localStorage.getItem('profile')!)))
 				setProfile(JSON.parse(localStorage.getItem('profile')!));
 		}
 		f();
@@ -53,8 +67,11 @@ const App = () => {
 
 	return (
 		<>
-			{loggedIn ? <>
-				<div className='font-poppins fixed top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/4 md:-translate-y-1/2 select-none grid md:grid-cols-2 gap-64 lg:gap-32 xl:gap-16'>
+			<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'/>
+			{loggedIn ? // Logged In
+			<>
+				<div className={`font-poppins fixed top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/4 md:-translate-y-1/2 select-none \
+				grid ${tracks.length === 1 ? '' : 'md:grid-cols-2'} gap-64 lg:gap-32 xl:gap-16`}>
 					<div className='flex flex-col gap-4 justify-center place-items-center'>
 						<h2 className='font-semibold text-2xl'>Generator</h2>
 						<div className='rounded-lg text-white p-1 overflow-hidden bg-gradient-to-br from-primary-500 to-secondary-500'>
@@ -75,7 +92,7 @@ const App = () => {
 								</div>
 								<button 
 									onClick={() => generatePlaylist()}
-									className='px-4 py-3 max-w-[200px] w-full rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 hover:bg-slate-200 text-white select-none font-medium'>
+									className='px-4 py-3 max-w-[200px] w-full rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white select-none font-medium'>
 										Generate
 								</button>
 							</div>
@@ -85,7 +102,7 @@ const App = () => {
 							<ProfileCard profile={profile}/>
 							<button
 								onClick={() => {
-										document.location = 'http://localhost:3000';
+										setLoggedIn(false);
 										sessionStorage.removeItem('access_token');
 									}}
 								className='px-1 py-1 max-w-[200px] w-full rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 hover:bg-slate-200 text-white select-none font-medium'>
@@ -93,7 +110,7 @@ const App = () => {
 							</button>
 						</div>
 					</div>
-					<div className='invisible md:visible flex flex-col gap-4 justify-center place-items-center'>
+					<div className={`tracks invisible ${tracks.length === 1 ? 'hidden' : 'md:visible'} flex flex-col gap-4 justify-center place-items-center`}>
 						<h2 className='font-semibold text-2xl'>Tracks</h2>
 						<div className='rounded-lg text-white p-1 overflow-hidden bg-gradient-to-br from-primary-500 to-secondary-500'>
 							<div className='bg-[#121212] flex flex-col p-4 gap-4'>
@@ -102,9 +119,10 @@ const App = () => {
 										{tracks.map((track, index) => <li key={index}><TrackCard track={track}/></li>)}
 									</ul>
 								</div>
-								<button 
-									onClick={() => createPlaylist(profile, tracks)}
-									className='px-4 py-3 max-w-[200px] w-full rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 hover:bg-slate-200 text-white select-none font-medium place-self-center'>
+								<input type='text' className={`${tracks.length === 1 ? 'invisible' : 'visible'} bg-[#262626] py-2 px-4 rounded-xl`} placeholder='Playlist Name...' id='playlistName'/>
+								<button
+									onClick={() => createPlaylist(profile, (document.getElementById('playlistName')! as HTMLInputElement).value, tracks)}
+									className='px-4 py-3 max-w-[200px] w-full rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white select-none font-medium place-self-center'>
 										Add To My Profile
 								</button>
 							</div>
@@ -112,8 +130,7 @@ const App = () => {
 
 					</div>
 				</div>
-
-			</> : 
+			</> : // Logged out
 			<div className='font-poppins fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col gap-4 justify-center place-items-center'>
 				<h1 className='text-5xl md:text-7xl font-bold mb-4'>Playlist Generator</h1>
 				{Object.keys(profile).length !== 0 ? 
@@ -133,7 +150,7 @@ const App = () => {
 				}
 				<button
 					onClick={() => redirectToAuthCodeFlow(clientId)}
-					className='px-4 py-3 max-w-[200px] w-full rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 hover:bg-slate-200 text-white select-none font-medium'>
+					className='px-4 py-3 max-w-[200px] w-full rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white select-none font-medium'>
 						<div className='grid grid-cols-4'>
 							<p className='col-span-3 text-right'>Spotify Login</p>
 							<i className='bx bxl-spotify text-white text-2xl col-span-1 align-middle text-right'/>

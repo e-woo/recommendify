@@ -12,6 +12,6 @@
     border-radius: 5px;
 }
  
-::-webkit-scrollbar-thumb:hover {
-    background: #ce354e;
+.tracks ::-webkit-scrollbar-thumb:hover {
+    background: #a82c41;
 }

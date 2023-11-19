@@ -51,7 +51,6 @@ export async function getAccessToken(clientId: string, code: string) {
         body: params
     });
     const response = await result.json();
-    terminal.log(response);
     sessionStorage.setItem('access_token', response.access_token);
     localStorage.setItem('refresh_token', response.refresh_token);
 }
@@ -71,6 +70,7 @@ export async function getRefreshToken(clientId: string) {
         body: params,
     });
     const response = await result.json();
+
     sessionStorage.setItem('access_token', response.access_token);
     localStorage.setItem('refresh_token', response.refresh_token);
    }
