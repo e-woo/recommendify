@@ -84,11 +84,10 @@ export async function fetchProfile(): Promise<Object> {
         }
     }
     const accessToken = sessionStorage.getItem('access_token');
-    const result = await fetch('https://api.spotify.com/v1/me',
-        {
-            method: "GET",
-            headers: { 'Authorization': `Bearer ${accessToken}` }
-        }
+    const result = await fetch('https://api.spotify.com/v1/me', {
+        method: "GET",
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+    }
     ).then(response => response.json()).then(data => {return data});
     localStorage.setItem('profile', JSON.stringify(result));
     return result;

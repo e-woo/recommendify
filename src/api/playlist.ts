@@ -21,27 +21,39 @@ export async function getGenres(): Promise<Array<string>> {
 	return response.genres;
 }
 
-export async function generate(genre: string, trackCount: number, profile: any): Promise<Track[]> {
+export async function generate(genre: string, trackCount: number, profile: any){// : Promise<Track[]> {
 	const accessToken = sessionStorage.getItem('access_token');
-	const result = await fetch(`https://api.spotify.com/v1/recommendations?limit=${trackCount}&market=${profile.country}&seed_genres=${genre}`, {
+	return await fetch(`https://api.spotify.com/v1/recommendations?limit=${trackCount}&market=${profile.country}&seed_genres=${genre}`, {
         method: 'GET',
 		headers: {
 			'Authorization': `Bearer ${accessToken}`
 		}
-	}).then(response => response.json()).then(data => {return data.tracks});
+	}).then(response => response.json()).then(data => {return data});
 
+	// const tracks: Track[] = [];
+	// result.forEach((track: any) => {tracks.push({
+	// 	uri: track.uri, // string
+	// 	name: track.name, // string
+	// 	artists: track.artists, // array
+	// 	image: track.album.images[0].url // string
+	// })})
+
+	// return tracks;
+}
+
+export function filterTracks(data: any): Track[] {
 	const tracks: Track[] = [];
-	result.forEach((track: any) => {tracks.push({
+	data.forEach((track: any) => {tracks.push({
 		uri: track.uri, // string
 		name: track.name, // string
 		artists: track.artists, // array
 		image: track.album.images[0].url // string
 	})})
-	console.log(tracks);
 	return tracks;
 }
 
-export async function createPlaylist(profile: any, name: string, tracks: Array<any>) {
+
+export async function create(profile: any, name: string, tracks: Array<any>) {
 	if (name === '')
 		name = 'Untitled Playlist';
     const id = profile.id
@@ -65,7 +77,7 @@ export async function createPlaylist(profile: any, name: string, tracks: Array<a
 	// populate playlist
 	const uris: string[] = [];
 	tracks.forEach((track) => uris.push(track.uri))
-	await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+	return await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
 		method: 'POST',
 		headers: {
 		  'Authorization': `Bearer ${accessToken}`,
@@ -75,5 +87,5 @@ export async function createPlaylist(profile: any, name: string, tracks: Array<a
 		  'uris': uris,
 		  'position': 0
 		})
-	});
+	}).then(response => response.json()).then(data => {return data});
 }

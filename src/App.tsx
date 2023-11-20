@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import './scrollbar.css';
 import { fetchProfile, getAccessToken, getRefreshToken, redirectToAuthCodeFlow } from './api/auth';
-import { createPlaylist, getGenres, generate, Track } from './api/playlist';
+import { create, getGenres, generate, Track, filterTracks } from './api/playlist';
 import ProfileCard from './components/ProfileCard';
 import TrackCard from './components/TrackCard';
 const App = () => {
@@ -14,10 +14,31 @@ const App = () => {
 	const [profile, setProfile] = useState({});
 	const [genres, setGenres] = useState<string[]>([]);
 	const [loggedIn, setLoggedIn] = useState(false);
-	const [tracks, setTracks] = useState<Array<Track>>([{uri: '', name: '', artists: [], image: ''}]);
+	const [tracks, setTracks] = useState<Array<Track>>([]);
+
+	// message element states
+	const [loginErrorMessage, setLoginErrorMessage] = useState(<></>); // tells the user to reauthorize Spotify account
+	const [generateMessage, setGenerateMessage] = useState(<></>); // playlist generation result
+	const [playlistMessage, setPlaylistMessage] = useState(<></>); // playlist creation result
 
 	async function generatePlaylist() {
-		setTracks(await generate((document.getElementById('category')! as HTMLFormElement).value, trackCount, profile))
+		const result = await generate((document.getElementById('category')! as HTMLFormElement).value, trackCount, profile);
+		setPlaylistMessage(<></>);
+		if ('error' in result) {
+			setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>An error occured while generating your playlist. Please refresh the page.</h4>);
+			setTracks([]);
+		}
+		else {
+			setGenerateMessage(<h4 className='text-[#50fa50] text-lg'>Playlist successfully generated!</h4>);
+			setTracks(filterTracks(result.tracks));
+		}
+	}
+
+	async function createPlaylist(profile: any, name: string, tracks: Array<any>) {
+		const result = await create(profile, name, tracks);
+		setPlaylistMessage('error' in result ? 
+		<h4 className='text-[#fa5050] text-lg'>An error occured while creating your playlist. Please refresh the page.</h4> :
+		<h4 className='text-[#50fa50] text-lg'>Playlist successfully created!</h4>);
 	}
 	
 	useEffect(() => {
@@ -34,13 +55,14 @@ const App = () => {
 			// if refresh token is bad, the user will need to reauthorize, so clear local storage
 			else if (refreshToken === 'undefined' || refreshToken === null) {
 				setLoggedIn(false);
+				setLoginErrorMessage(<h4 className='text-[#fa5050] text-lg'>An error occured with authroization. Please log in to Spotify again.</h4>);
 				localStorage.removeItem('profile');
 				localStorage.removeItem('refresh_token');
 				localStorage.removeItem('verifier');
 				sessionStorage.removeItem('access_token')
 			}
 
-			// get refresh token
+			// get token using refresh token
 			else
 				getRefreshToken(clientId);
 
@@ -71,7 +93,7 @@ const App = () => {
 			{loggedIn ? // Logged In
 			<>
 				<div className={`font-poppins fixed top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/4 md:-translate-y-1/2 select-none \
-				grid ${tracks.length === 1 ? '' : 'md:grid-cols-2'} gap-64 lg:gap-32 xl:gap-16`}>
+				grid ${tracks.length === 0 ? '' : 'md:grid-cols-2'} gap-64 lg:gap-32 xl:gap-16`}>
 					<div className='flex flex-col gap-4 justify-center place-items-center'>
 						<h2 className='font-semibold text-2xl'>Generator</h2>
 						<div className='rounded-lg text-white p-1 overflow-hidden bg-gradient-to-br from-primary-500 to-secondary-500'>
@@ -97,6 +119,7 @@ const App = () => {
 								</button>
 							</div>
 						</div>
+						{generateMessage}
 						<div className='font-poppins md:translate-y-1/4 flex flex-col gap-4 justify-center place-items-center'>
 							<h2>Logged in as {(profile as any).display_name}</h2>
 							<ProfileCard profile={profile}/>
@@ -110,7 +133,7 @@ const App = () => {
 							</button>
 						</div>
 					</div>
-					<div className={`tracks invisible ${tracks.length === 1 ? 'hidden' : 'md:visible'} flex flex-col gap-4 justify-center place-items-center`}>
+					<div className={`tracks invisible ${tracks.length === 0 ? 'hidden' : 'md:visible'} flex flex-col gap-4 justify-center place-items-center`}>
 						<h2 className='font-semibold text-2xl'>Tracks</h2>
 						<div className='rounded-lg text-white p-1 overflow-hidden bg-gradient-to-br from-primary-500 to-secondary-500'>
 							<div className='bg-[#121212] flex flex-col p-4 gap-4'>
@@ -127,7 +150,7 @@ const App = () => {
 								</button>
 							</div>
 						</div>
-
+						{playlistMessage}
 					</div>
 				</div>
 			</> : // Logged out
@@ -148,6 +171,7 @@ const App = () => {
 						<p className='text-xl mt-32'>Not you?</p>
 					</> : <h1 className='text-2xl md:text-4xl font-bold mb-4'>Welcome!</h1>
 				}
+				{loginErrorMessage}
 				<button
 					onClick={() => redirectToAuthCodeFlow(clientId)}
 					className='px-4 py-3 max-w-[200px] w-full rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white select-none font-medium'>
