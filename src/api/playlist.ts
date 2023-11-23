@@ -23,22 +23,25 @@ export async function getGenres(): Promise<Array<string>> {
 
 export async function generate(genre: string, trackCount: number, profile: any){// : Promise<Track[]> {
 	const accessToken = sessionStorage.getItem('access_token');
-	return await fetch(`https://api.spotify.com/v1/recommendations?limit=${trackCount}&market=${profile.country}&seed_genres=${genre}`, {
+
+	/* // TOP ARTIST SEEDING
+	const topArtistsResult = await fetch('https://api.spotify.com/v1/me/top/artists?limit=4', {
+		headers: {
+			'Authorization': `Bearer ${accessToken}`
+		}
+	}).then(response => response.json()).then(data => {return data});
+	const artists: string[] = [];
+	topArtistsResult.items.map((artist: any) => artists.push(artist.id));
+	const artistString = artists.join('%2C');
+	*/
+	
+	const artistString = '';
+	return await fetch(`https://api.spotify.com/v1/recommendations?limit=${trackCount}&market=${profile.country}&seed_genres=${genre}&seed_artists=${artistString}`, {
         method: 'GET',
 		headers: {
 			'Authorization': `Bearer ${accessToken}`
 		}
 	}).then(response => response.json()).then(data => {return data});
-
-	// const tracks: Track[] = [];
-	// result.forEach((track: any) => {tracks.push({
-	// 	uri: track.uri, // string
-	// 	name: track.name, // string
-	// 	artists: track.artists, // array
-	// 	image: track.album.images[0].url // string
-	// })})
-
-	// return tracks;
 }
 
 export function filterTracks(data: any): Track[] {
@@ -53,15 +56,14 @@ export function filterTracks(data: any): Track[] {
 }
 
 
-export async function create(profile: any, name: string, tracks: Array<any>) {
+export async function create(profile: any, name: string, tracks: Array<any>, playlistPublic: boolean) {
 	if (name === '')
 		name = 'Untitled Playlist';
     const id = profile.id
     const accessToken = sessionStorage.getItem('access_token');
 
 	// create playlist
-    const playlistId = await fetch(`https://api.spotify.com/v1/users/${id}/playlists`,
-    {
+    const playlistId = await fetch(`https://api.spotify.com/v1/users/${id}/playlists`, {
         method: "POST",
         headers: { 
             'Authorization': `Bearer ${accessToken}`,
@@ -70,7 +72,7 @@ export async function create(profile: any, name: string, tracks: Array<any>) {
         body: JSON.stringify({
             'name': name,
             'description': 'New playlist description',
-            'public': false
+            'public': playlistPublic
         })
     }).then(response => response.json()).then(data => {return data.id});
 

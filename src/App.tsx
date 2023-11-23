@@ -15,6 +15,7 @@ const App = () => {
 	const [genres, setGenres] = useState<string[]>([]);
 	const [loggedIn, setLoggedIn] = useState(false);
 	const [tracks, setTracks] = useState<Array<Track>>([]);
+	const [playlistPublic, setPlaylistPublic] = useState(false);
 
 	// message element states
 	const [loginErrorMessage, setLoginErrorMessage] = useState(<></>); // tells the user to reauthorize Spotify account
@@ -35,7 +36,7 @@ const App = () => {
 	}
 
 	async function createPlaylist(profile: any, name: string, tracks: Array<any>) {
-		const result = await create(profile, name, tracks);
+		const result = await create(profile, name, tracks, playlistPublic);
 		setPlaylistMessage('error' in result ? 
 		<h4 className='text-[#fa5050] text-lg'>An error occured while creating your playlist. Please refresh the page.</h4> :
 		<h4 className='text-[#50fa50] text-lg'>Playlist successfully created!</h4>);
@@ -92,15 +93,15 @@ const App = () => {
 			<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'/>
 			{loggedIn ? // Logged In
 			<>
-				<div className={`font-poppins fixed top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/4 md:-translate-y-1/2 select-none \
-				grid ${tracks.length === 0 ? '' : 'md:grid-cols-2'} gap-64 lg:gap-32 xl:gap-16`}>
+				<div className={`font-poppins md:fixed md:top-[50%] md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 select-none \
+				md:grid ${tracks.length === 0 ? '' : 'md:grid-cols-2'} gap-64 lg:gap-48 xl:gap-32`}>
 					<div className='flex flex-col gap-4 justify-center place-items-center'>
 						<h2 className='font-semibold text-2xl'>Generator</h2>
 						<div className='rounded-lg text-white p-1 overflow-hidden bg-gradient-to-br from-primary-500 to-secondary-500'>
-							<div className='bg-[#121212] flex flex-col p-4 gap-4'>
+							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg'>
 								<div>
 									<h4 className='font-medium mb-2'>Genre</h4>
-									<select id='category' className='bg-[#262626] p-2 text-center text-md rounded-2xl select-none'>
+									<select id='category' className='bg-[#262626] p-2 text-center text-md rounded-2xl select-none border-none focus:ring-primary-500 focus:ring-2'>
 										{genres.map((item, index) => <option value={item} key={index}>{capitalize(item)}</option>)}
 									</select>
 								</div>
@@ -120,7 +121,7 @@ const App = () => {
 							</div>
 						</div>
 						{generateMessage}
-						<div className='font-poppins md:translate-y-1/4 flex flex-col gap-4 justify-center place-items-center'>
+						<div className='font-poppins md:translate-y-1/4 flex-col gap-4 justify-center place-items-center hidden md:flex'>
 							<h2>Logged in as {(profile as any).display_name}</h2>
 							<ProfileCard profile={profile}/>
 							<button
@@ -133,16 +134,21 @@ const App = () => {
 							</button>
 						</div>
 					</div>
-					<div className={`tracks invisible ${tracks.length === 0 ? 'hidden' : 'md:visible'} flex flex-col gap-4 justify-center place-items-center`}>
+					<div className={`tracks ${tracks.length === 0 ? 'invisible hidden' : 'visible flex'} flex-col gap-4 justify-center place-items-center mt-8 md:mt-0`}>
 						<h2 className='font-semibold text-2xl'>Tracks</h2>
 						<div className='rounded-lg text-white p-1 overflow-hidden bg-gradient-to-br from-primary-500 to-secondary-500'>
-							<div className='bg-[#121212] flex flex-col p-4 gap-4'>
+							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg'>
 								<div className='overflow-auto overflow-y-scroll h-96'>
 									<ul className='gap-2 w-72 xl:w-96'>
 										{tracks.map((track, index) => <li key={index}><TrackCard track={track}/></li>)}
 									</ul>
 								</div>
-								<input type='text' className={`${tracks.length === 1 ? 'invisible' : 'visible'} bg-[#262626] py-2 px-4 rounded-xl`} placeholder='Playlist Name...' id='playlistName'/>
+								<input type='text' className={`${tracks.length === 1 ? 'invisible' : 'visible'} bg-[#262626] py-2 px-4 rounded-xl border-none focus:ring-primary-500 focus:ring-2`} placeholder='Playlist Name...' id='playlistName'/>
+								<span>
+									<input type='checkbox' id='playlistPublic' onChange={e => setPlaylistPublic(e.target.checked)}
+									className='text-secondary-500 mr-4 focus:ring-2 focus:ring-secondary-400 focus:ring-offset-gray-800 rounded bg-[#262626] border-none w-6 h-6'/>
+									<label htmlFor='public'>Show on my public profile</label>
+								</span>
 								<button
 									onClick={() => createPlaylist(profile, (document.getElementById('playlistName')! as HTMLInputElement).value, tracks)}
 									className='px-4 py-3 max-w-[200px] w-full rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white select-none font-medium place-self-center'>
@@ -151,6 +157,18 @@ const App = () => {
 							</div>
 						</div>
 						{playlistMessage}
+					</div>
+					<div className='font-poppins md:translate-y-1/4 flex-col gap-4 justify-center place-items-center md:hidden flex mt-8 md:mt-0'>
+						<h2>Logged in as {(profile as any).display_name}</h2>
+						<ProfileCard profile={profile}/>
+						<button
+							onClick={() => {
+									setLoggedIn(false);
+									sessionStorage.removeItem('access_token');
+								}}
+							className='px-1 py-1 max-w-[200px] w-full rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 hover:bg-slate-200 text-white select-none font-medium'>
+							<span className='block bg-[#121212] hover:bg-slate-800 rounded-full px-8 py-2'>Logout</span>
+						</button>
 					</div>
 				</div>
 			</> : // Logged out
