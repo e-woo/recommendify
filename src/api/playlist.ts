@@ -21,9 +21,8 @@ export async function getGenres(): Promise<Array<string>> {
 	return response.genres;
 }
 
-export async function generate(genre: string, trackCount: number, profile: any){// : Promise<Track[]> {
+export async function generate(genre: string, trackCount: number, profile: any) {// : Promise<Track[]> {
 	const accessToken = sessionStorage.getItem('access_token');
-
 	/* // TOP ARTIST SEEDING
 	const topArtistsResult = await fetch('https://api.spotify.com/v1/me/top/artists?limit=4', {
 		headers: {

@@ -5,6 +5,8 @@ import { fetchProfile, getAccessToken, getRefreshToken, redirectToAuthCodeFlow }
 import { create, getGenres, generate, Track, filterTracks } from './api/playlist';
 import ProfileCard from './components/ProfileCard';
 import TrackCard from './components/TrackCard';
+import GenreSelector from './components/GenreSelector';
+import ArtistSelector from './components/ArtistSelector';
 const App = () => {
 	const clientId = '';
 	const params = new URLSearchParams(window.location.search);
@@ -16,6 +18,8 @@ const App = () => {
 	const [loggedIn, setLoggedIn] = useState(false);
 	const [tracks, setTracks] = useState<Array<Track>>([]);
 	const [playlistPublic, setPlaylistPublic] = useState(false);
+	const [seeds, setSeeds] = useState<Array<JSX.Element>>([]);
+	const [showSeedMenu, setShowSeedMenu] = useState(false);
 
 	// message element states
 	const [loginErrorMessage, setLoginErrorMessage] = useState(<></>); // tells the user to reauthorize Spotify account
@@ -23,7 +27,16 @@ const App = () => {
 	const [playlistMessage, setPlaylistMessage] = useState(<></>); // playlist creation result
 
 	async function generatePlaylist() {
-		const result = await generate((document.getElementById('category')! as HTMLFormElement).value, trackCount, profile);
+		if (seeds.length === 0) {
+			setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>Please add at least one seed.</h4>);
+			return;
+		}
+
+		const genres: string[] = [];
+		for (let i = 0; i < seeds.length; i++)
+			genres.push((document.getElementById('seed' + i)! as HTMLFormElement).value);
+
+		const result = await generate(genres.join('%2C'), trackCount, profile);
 		setPlaylistMessage(<></>);
 		if ('error' in result) {
 			setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>An error occured while generating your playlist. Please refresh the page.</h4>);
@@ -41,6 +54,20 @@ const App = () => {
 		<h4 className='text-[#fa5050] text-lg'>An error occured while creating your playlist. Please refresh the page.</h4> :
 		<h4 className='text-[#50fa50] text-lg'>Playlist successfully created!</h4>);
 	}
+
+	useEffect(() => {
+		function close() {
+		  setShowSeedMenu(false);
+		}
+
+		if (showSeedMenu) {
+			setTimeout(() => window.addEventListener("click", close), 50);
+		}
+
+		return function removeListener() {
+		  window.removeEventListener("click", close);
+		}
+	}, [showSeedMenu]);
 	
 	useEffect(() => {
 		async function authorize() {
@@ -100,10 +127,40 @@ const App = () => {
 						<div className='rounded-lg text-white p-1 overflow-hidden bg-gradient-to-br from-primary-500 to-secondary-500'>
 							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg'>
 								<div>
-									<h4 className='font-medium mb-2'>Genre</h4>
+									{/* <h4 className='font-medium mb-2'>Genre</h4>
 									<select id='category' className='bg-[#262626] p-2 text-center text-md rounded-2xl select-none border-none focus:ring-primary-500 focus:ring-2'>
 										{genres.map((item, index) => <option value={item} key={index}>{capitalize(item)}</option>)}
-									</select>
+									</select> */}
+									<h4 className='font-medium mb-2'>Seeds</h4>
+									<div className=' bg-[#181818] p-3 rounded-2xl'>
+										<ul className='gap-2 grid row-span-5'> {
+											seeds.map((item, index) => 
+												<li key={index}>
+													<>{item}</>
+												</li>
+											)
+											}
+											{seeds.length < 5 ? <>
+											<div className='relative inline-block '>
+											<div 
+												onClick={() => /*setSeeds(seeds => [...seeds, <GenreSelector genres={genres}/>])*/ {setShowSeedMenu(!showSeedMenu)}}
+												className={`bg-[#262626] p-2 text-center text-md rounded${showSeedMenu ? '-t' : ''}-2xl select-none hover:bg-[#383838] cursor-pointer`}>
+													<i className='bx bx-plus-circle text-lg text-center align-middle'/>
+											</div>
+											<div className={`${showSeedMenu ? '' : 'hidden'}`}>
+												<div className='absolute w-full z-[10] block bg-[#202020] rounded-b-2xl'>
+													<div onClick={() => setSeeds(seeds => [...seeds, <GenreSelector genres={genres} index={seeds.length}/>])}
+														className='bg-[#202020] text-center text-md select-none hover:bg-[#383838] cursor-pointer p-2'>Genre</div>
+													<div onClick={() => setSeeds(seeds => [...seeds, <ArtistSelector/>])}
+														className='bg-[#202020] text-center text-md select-none hover:bg-[#383838] cursor-pointer p-2'>Artist</div>
+													<div className='bg-[#202020] text-center text-md rounded-b-2xl select-none hover:bg-[#383838] cursor-pointer p-2'>Track</div>
+												</div>
+											</div>
+											</div>
+												
+												</>: <></>}
+										</ul>
+									</div>
 								</div>
 								<div>
 									<h4 className='font-medium mb-2'>Track Count</h4>
