@@ -33,8 +33,9 @@ const App = () => {
 		}
 
 		const genres: string[] = [];
-		for (let i = 0; i < seeds.length; i++)
-			genres.push((document.getElementById('seed' + i)! as HTMLFormElement).value);
+		for (let i = 0; i < seeds.length; i++) {
+			if (seeds[i].type.name === 'GenreSelector')
+			genres.push((document.getElementById('seed' + i)! as HTMLFormElement).value);}
 
 		const result = await generate(genres.join('%2C'), trackCount, profile);
 		setPlaylistMessage(<></>);
@@ -120,13 +121,13 @@ const App = () => {
 			<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'/>
 			{loggedIn ? // Logged In
 			<>
-				<div className={`font-poppins md:fixed md:top-[50%] md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 select-none \
-				md:grid ${tracks.length === 0 ? '' : 'md:grid-cols-2'} gap-64 lg:gap-48 xl:gap-32`}>
+				<div className={`font-poppins lg:fixed lg:top-[50%] lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 select-none \
+				lg:grid ${tracks.length === 0 ? '' : 'lg:grid-cols-2'} gap-64 lg:gap-48 xl:gap-32`}>
 					<div className='flex flex-col gap-4 justify-center place-items-center'>
 						<h2 className='font-semibold text-2xl'>Generator</h2>
-						<div className='rounded-lg text-white p-1 overflow-hidden bg-gradient-to-br from-primary-500 to-secondary-500'>
-							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg'>
-								<div>
+						<div className='rounded-lg text-white p-1 bg-gradient-to-br from-primary-500 to-secondary-500 overflow-visible'>
+							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg place-items-center overflow-visible w-72'>
+								<div className='w-full'>
 									{/* <h4 className='font-medium mb-2'>Genre</h4>
 									<select id='category' className='bg-[#262626] p-2 text-center text-md rounded-2xl select-none border-none focus:ring-primary-500 focus:ring-2'>
 										{genres.map((item, index) => <option value={item} key={index}>{capitalize(item)}</option>)}
@@ -141,10 +142,10 @@ const App = () => {
 											)
 											}
 											{seeds.length < 5 ? <>
-											<div className='relative inline-block '>
+											<div className='relative inline-block'>
 											<div 
 												onClick={() => /*setSeeds(seeds => [...seeds, <GenreSelector genres={genres}/>])*/ {setShowSeedMenu(!showSeedMenu)}}
-												className={`bg-[#262626] p-2 text-center text-md rounded${showSeedMenu ? '-t' : ''}-2xl select-none hover:bg-[#383838] cursor-pointer`}>
+												className={`bg-[#262626] p-2 text-center text-md ${showSeedMenu ? 'rounded-t-2xl' : 'rounded-2xl'} select-none hover:bg-[#383838] cursor-pointer`}>
 													<i className='bx bx-plus-circle text-lg text-center align-middle'/>
 											</div>
 											<div className={`${showSeedMenu ? '' : 'hidden'}`}>
@@ -178,7 +179,7 @@ const App = () => {
 							</div>
 						</div>
 						{generateMessage}
-						<div className='font-poppins md:translate-y-1/4 flex-col gap-4 justify-center place-items-center hidden md:flex'>
+						<div className='font-poppins md:translate-y-1/4 lg:translate-y-[10%] flex-col gap-4 justify-center place-items-center hidden lg:flex'>
 							<h2>Logged in as {(profile as any).display_name}</h2>
 							<ProfileCard profile={profile}/>
 							<button
@@ -215,7 +216,7 @@ const App = () => {
 						</div>
 						{playlistMessage}
 					</div>
-					<div className='font-poppins md:translate-y-1/4 flex-col gap-4 justify-center place-items-center md:hidden flex mt-8 md:mt-0'>
+					<div className='font-poppins md:translate-y-1/4 flex-col gap-4 justify-center place-items-center lg:hidden flex mt-8 md:mt-0'>
 						<h2>Logged in as {(profile as any).display_name}</h2>
 						<ProfileCard profile={profile}/>
 						<button
