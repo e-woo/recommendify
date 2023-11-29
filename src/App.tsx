@@ -7,6 +7,8 @@ import ProfileCard from './components/ProfileCard';
 import TrackCard from './components/TrackCard';
 import GenreSelector from './components/GenreSelector';
 import ArtistSelector from './components/ArtistSelector';
+
+let seedId = 0;
 const App = () => {
 	const clientId = '';
 	const params = new URLSearchParams(window.location.search);
@@ -54,6 +56,10 @@ const App = () => {
 		setPlaylistMessage('error' in result ? 
 		<h4 className='text-[#fa5050] text-lg'>An error occured while creating your playlist. Please refresh the page.</h4> :
 		<h4 className='text-[#50fa50] text-lg'>Playlist successfully created!</h4>);
+	}
+
+	function removeSeed(index: number) {
+		setSeeds(s => s.filter((f, i) => i !== index));
 	}
 
 	useEffect(() => {
@@ -126,7 +132,7 @@ const App = () => {
 					<div className='flex flex-col gap-4 justify-center place-items-center'>
 						<h2 className='font-semibold text-2xl'>Generator</h2>
 						<div className='rounded-lg text-white p-1 bg-gradient-to-br from-primary-500 to-secondary-500 overflow-visible'>
-							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg place-items-center overflow-visible w-72'>
+							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg place-items-center overflow-visible w-80'>
 								<div className='w-full'>
 									{/* <h4 className='font-medium mb-2'>Genre</h4>
 									<select id='category' className='bg-[#262626] p-2 text-center text-md rounded-2xl select-none border-none focus:ring-primary-500 focus:ring-2'>
@@ -136,8 +142,13 @@ const App = () => {
 									<div className=' bg-[#181818] p-3 rounded-2xl'>
 										<ul className='gap-2 grid row-span-5'> {
 											seeds.map((item, index) => 
-												<li key={index}>
-													<>{item}</>
+												<li key={item.key} className='flex flex-row gap-2'>
+													{item}
+													<div key={item.key} className='col-span-1 text-xl flex place-items-center justify-center cursor-pointer' onClick={() => {
+														setSeeds(seeds.filter((_i, j) => j != index));
+													}}>
+														<i className='bx bx-minus-circle place-self-center'/>
+													</div>
 												</li>
 											)
 											}
@@ -150,9 +161,9 @@ const App = () => {
 											</div>
 											<div className={`${showSeedMenu ? '' : 'hidden'}`}>
 												<div className='absolute w-full z-[10] block bg-[#202020] rounded-b-2xl'>
-													<div onClick={() => setSeeds(seeds => [...seeds, <GenreSelector genres={genres} index={seeds.length}/>])}
+													<div onClick={() => {setSeeds(seeds => [...seeds, <GenreSelector genres={genres} index={seeds.length} key={seedId}/>]); seedId++;}}
 														className='bg-[#202020] text-center text-md select-none hover:bg-[#383838] cursor-pointer p-2'>Genre</div>
-													<div onClick={() => setSeeds(seeds => [...seeds, <ArtistSelector/>])}
+													<div onClick={() => {setSeeds(seeds => [...seeds, <ArtistSelector key={seedId}/>]); seedId++;}}
 														className='bg-[#202020] text-center text-md select-none hover:bg-[#383838] cursor-pointer p-2'>Artist</div>
 													<div className='bg-[#202020] text-center text-md rounded-b-2xl select-none hover:bg-[#383838] cursor-pointer p-2'>Track</div>
 												</div>
@@ -262,9 +273,5 @@ const App = () => {
 		</>
     );
 };
-
-function capitalize(str: string) {
-	return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 export default App;
