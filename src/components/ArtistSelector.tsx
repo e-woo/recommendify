@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { searchArtists } from '../api/search';
 import ArtistCard from './ArtistCard';
 
-const ArtistSelector = () => {
+const ArtistSelector = ( {index} : {index: number}) => {
 	const [showArtists, setShowArtists] = useState(false);
 	const [artists, setArtists] = useState<Array<Artist>>([]);
 	const [selected, setSelected] = useState(false);
@@ -17,7 +17,7 @@ const ArtistSelector = () => {
 	function search() {
 		clearTimeout(delay);
 		delay = setTimeout(async () => {
-			const query = (document.getElementById('searchBar') as any).value;
+			const query = (document.getElementById('searchBar' + index) as any).value;
 			if (!query)
 				return;
 
@@ -61,14 +61,15 @@ const ArtistSelector = () => {
 	return (selected ?
 		<div className='bg-[#262626] p-2 text-center text-md rounded-2xl select-none border-none w-full grid grid-cols-8'>
 			<div className='col-span-7'>
-				<ArtistCard artist={artist} onClick={() => {}}/> 
+				<ArtistCard artist={artist} onClick={() => {}}/>
+				<div id={'artist' + index} artist-id={artist.id}/>
 			</div>
 		</div> :
 		<div className='relative text-left text-sm'>
 			<input
 				type='text'
 				placeholder='Search Artist...'
-				id = 'searchBar'
+				id = {'searchBar' + index}
 				onKeyUp={search}
 				className={`bg-[#262626] py-2 px-4 text-md ${showArtists ? 'rounded-t-2xl' : 'rounded-2xl'} select-none border-none focus:ring-primary-500 focus:ring-2 inline-block w-full`}/>
 			<ul className={`${showArtists ? '' : 'hidden'} absolute z-[10] block bg-[#202020] rounded-b-lg w-full overflow-y-auto max-h-64`}>

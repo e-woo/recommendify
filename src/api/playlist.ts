@@ -21,7 +21,7 @@ export async function getGenres(): Promise<Array<string>> {
 	return response.genres;
 }
 
-export async function generate(genre: string, trackCount: number, profile: any) {// : Promise<Track[]> {
+export async function generate(genre: string, artist: string, trackCount: number, profile: any) {// : Promise<Track[]> {
 	const accessToken = sessionStorage.getItem('access_token');
 	/* // TOP ARTIST SEEDING
 	const topArtistsResult = await fetch('https://api.spotify.com/v1/me/top/artists?limit=4', {
@@ -33,9 +33,10 @@ export async function generate(genre: string, trackCount: number, profile: any) 
 	topArtistsResult.items.map((artist: any) => artists.push(artist.id));
 	const artistString = artists.join('%2C');
 	*/
+	console.log('Genre string: ' + genre);
+	console.log('Artist string: ' + artist);
 	
-	const artistString = '';
-	return await fetch(`https://api.spotify.com/v1/recommendations?limit=${trackCount}&market=${profile.country}&seed_genres=${genre}&seed_artists=${artistString}`, {
+	return await fetch(`https://api.spotify.com/v1/recommendations?limit=${trackCount}&market=${profile.country}&seed_genres=${genre}&seed_artists=${artist}`, {
         method: 'GET',
 		headers: {
 			'Authorization': `Bearer ${accessToken}`

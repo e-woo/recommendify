@@ -18,9 +18,11 @@ const App = () => {
 	const [profile, setProfile] = useState({});
 	const [genres, setGenres] = useState<string[]>([]);
 	const [loggedIn, setLoggedIn] = useState(false);
-	const [tracks, setTracks] = useState<Array<Track>>([]);
+	const [tracks, setTracks] = useState<Track[]>([]);
 	const [playlistPublic, setPlaylistPublic] = useState(false);
-	const [seeds, setSeeds] = useState<Array<JSX.Element>>([]);
+	const [seeds, setSeeds] = useState<JSX.Element[]>([]);
+	const [seedIds, setSeedIds] = useState<number[]>([]);
+
 	const [showSeedMenu, setShowSeedMenu] = useState(false);
 
 	// message element states
@@ -29,24 +31,43 @@ const App = () => {
 	const [playlistMessage, setPlaylistMessage] = useState(<></>); // playlist creation result
 
 	async function generatePlaylist() {
+		setGenerateMessage(<></>);
+
+		// if no seed is entered yet
 		if (seeds.length === 0) {
 			setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>Please add at least one seed.</h4>);
 			return;
 		}
 
+		// seed arrays
 		const genres: string[] = [];
-		for (let i = 0; i < seeds.length; i++) {
-			if (seeds[i].type.name === 'GenreSelector')
-			genres.push((document.getElementById('seed' + i)! as HTMLFormElement).value);}
+		const artists: string[] = [];
 
-		const result = await generate(genres.join('%2C'), trackCount, profile);
+		// compute seeds used to generate playlist
+		for (let i = 0; i < seeds.length; i++) {
+			if (seeds[i].type.name === 'GenreSelector') // genre seed
+				genres.push((document.getElementById('genre' + seedIds[i])! as HTMLFormElement).value);
+			else if (seeds[i].type.name === 'ArtistSelector') { // artist seed
+				const a = document.getElementById('artist' + seedIds[i]);
+				if (a === null) { // if user has not entered in an artist yet
+					setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>Please enter your artist!</h4>);
+					return;
+				}
+				artists.push((a as HTMLDivElement).getAttribute('artist-ID') ?? '');
+			}
+		}
+
+		// generate playlist
+		const result = await generate(genres.join('%2C'), artists.join('%2C'), trackCount, profile);
 		setPlaylistMessage(<></>);
+
+		// error handling
 		if ('error' in result) {
 			setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>An error occured while generating your playlist. Please refresh the page.</h4>);
 			setTracks([]);
 		}
 		else {
-			setGenerateMessage(<h4 className='text-[#50fa50] text-lg'>Playlist successfully generated!</h4>);
+			setPlaylistMessage(<h4 className='text-[#50fa50] text-lg'>Playlist successfully generated!</h4>);
 			setTracks(filterTracks(result.tracks));
 		}
 	}
@@ -56,10 +77,6 @@ const App = () => {
 		setPlaylistMessage('error' in result ? 
 		<h4 className='text-[#fa5050] text-lg'>An error occured while creating your playlist. Please refresh the page.</h4> :
 		<h4 className='text-[#50fa50] text-lg'>Playlist successfully created!</h4>);
-	}
-
-	function removeSeed(index: number) {
-		setSeeds(s => s.filter((f, i) => i !== index));
 	}
 
 	useEffect(() => {
@@ -134,18 +151,15 @@ const App = () => {
 						<div className='rounded-lg text-white p-1 bg-gradient-to-br from-primary-500 to-secondary-500 overflow-visible'>
 							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg place-items-center overflow-visible w-80'>
 								<div className='w-full'>
-									{/* <h4 className='font-medium mb-2'>Genre</h4>
-									<select id='category' className='bg-[#262626] p-2 text-center text-md rounded-2xl select-none border-none focus:ring-primary-500 focus:ring-2'>
-										{genres.map((item, index) => <option value={item} key={index}>{capitalize(item)}</option>)}
-									</select> */}
 									<h4 className='font-medium mb-2'>Seeds</h4>
 									<div className=' bg-[#181818] p-3 rounded-2xl'>
 										<ul className='gap-2 grid row-span-5'> {
 											seeds.map((item, index) => 
 												<li key={item.key} className='flex flex-row gap-2'>
 													{item}
-													<div key={item.key} className='col-span-1 text-xl flex place-items-center justify-center cursor-pointer' onClick={() => {
-														setSeeds(seeds.filter((_i, j) => j != index));
+													<div className='col-span-1 text-xl flex place-items-center justify-center cursor-pointer' onClick={() => {
+														setSeeds(seeds.filter((_i, j) => j !== index));
+														setSeedIds(seedIds.filter((_i, j) => j !== index));
 													}}>
 														<i className='bx bx-minus-circle place-self-center'/>
 													</div>
@@ -155,15 +169,25 @@ const App = () => {
 											{seeds.length < 5 ? <>
 											<div className='relative inline-block'>
 											<div 
-												onClick={() => /*setSeeds(seeds => [...seeds, <GenreSelector genres={genres}/>])*/ {setShowSeedMenu(!showSeedMenu)}}
+												onClick={() => {setShowSeedMenu(!showSeedMenu)}}
 												className={`bg-[#262626] p-2 text-center text-md ${showSeedMenu ? 'rounded-t-2xl' : 'rounded-2xl'} select-none hover:bg-[#383838] cursor-pointer`}>
 													<i className='bx bx-plus-circle text-lg text-center align-middle'/>
 											</div>
 											<div className={`${showSeedMenu ? '' : 'hidden'}`}>
 												<div className='absolute w-full z-[10] block bg-[#202020] rounded-b-2xl'>
-													<div onClick={() => {setSeeds(seeds => [...seeds, <GenreSelector genres={genres} index={seeds.length} key={seedId}/>]); seedId++;}}
+													<div onClick={() => {
+														setSeeds(seeds => [...seeds, <GenreSelector genres={genres} index={seedId} key={seedId}/>]);
+														setSeedIds(seedIds => [...seedIds, seedId]);
+														setGenerateMessage(<></>);
+														seedId++;
+													}}
 														className='bg-[#202020] text-center text-md select-none hover:bg-[#383838] cursor-pointer p-2'>Genre</div>
-													<div onClick={() => {setSeeds(seeds => [...seeds, <ArtistSelector key={seedId}/>]); seedId++;}}
+													<div onClick={() => {
+														setSeeds(seeds => [...seeds, <ArtistSelector index={seedId} key={seedId}/>]);
+														setSeedIds(seedIds => [...seedIds, seedId]);
+														setGenerateMessage(<></>);
+														seedId++;
+													}}
 														className='bg-[#202020] text-center text-md select-none hover:bg-[#383838] cursor-pointer p-2'>Artist</div>
 													<div className='bg-[#202020] text-center text-md rounded-b-2xl select-none hover:bg-[#383838] cursor-pointer p-2'>Track</div>
 												</div>
@@ -216,7 +240,7 @@ const App = () => {
 								<span>
 									<input type='checkbox' id='playlistPublic' onChange={e => setPlaylistPublic(e.target.checked)}
 									className='text-secondary-500 mr-4 focus:ring-2 focus:ring-secondary-400 focus:ring-offset-gray-800 rounded bg-[#262626] border-none w-6 h-6'/>
-									<label htmlFor='public'>Show on my public profile</label>
+									<label htmlFor='playlistPublic'>Show on my public profile</label>
 								</span>
 								<button
 									onClick={() => createPlaylist(profile, (document.getElementById('playlistName')! as HTMLInputElement).value, tracks)}
