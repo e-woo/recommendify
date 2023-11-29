@@ -101,7 +101,7 @@ const App = () => {
 			if (code) {
 				await getAccessToken(clientId, code);
 				setLoggedIn(true);
-				document.location = 'http://localhost:3000'
+				document.location = '/'
 			}
 
 			// if refresh token is bad, the user will need to reauthorize, so clear local storage
@@ -171,7 +171,7 @@ const App = () => {
 											<div 
 												onClick={() => {setShowSeedMenu(!showSeedMenu)}}
 												className={`bg-[#262626] p-2 text-center text-md ${showSeedMenu ? 'rounded-t-2xl' : 'rounded-2xl'} select-none hover:bg-[#383838] cursor-pointer`}>
-													<i className='bx bx-plus-circle text-lg text-center align-middle'/>
+													<i className='bx bx-plus-circle text-xl text-center align-middle text-white'/>
 											</div>
 											<div className={`${showSeedMenu ? '' : 'hidden'}`}>
 												<div className='absolute w-full z-[10] block bg-[#202020] rounded-b-2xl'>
@@ -231,7 +231,7 @@ const App = () => {
 						<h2 className='font-semibold text-2xl'>Tracks</h2>
 						<div className='rounded-lg text-white p-1 overflow-hidden bg-gradient-to-br from-primary-500 to-secondary-500'>
 							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg'>
-								<div className='overflow-auto overflow-y-scroll h-96'>
+								<div className='overflow-auto overflow-y-scroll h-96 bg-[#181818] rounded-lg p-1'>
 									<ul className='gap-2 w-72 xl:w-96'>
 										{tracks.map((track, index) => <li key={index}><TrackCard track={track}/></li>)}
 									</ul>
@@ -239,7 +239,7 @@ const App = () => {
 								<input type='text' className={`${tracks.length === 1 ? 'invisible' : 'visible'} bg-[#262626] py-2 px-4 rounded-xl border-none focus:ring-primary-500 focus:ring-2`} placeholder='Playlist Name...' id='playlistName'/>
 								<span>
 									<input type='checkbox' id='playlistPublic' onChange={e => setPlaylistPublic(e.target.checked)}
-									className='text-secondary-500 mr-4 focus:ring-2 focus:ring-secondary-400 focus:ring-offset-gray-800 rounded bg-[#262626] border-none w-6 h-6'/>
+									className='text-secondary-500 mr-4 focus:ring-2 focus:ring-secondary-400 focus:ring-offset-gray-800 rounded bg-[#262626] border-none w-6 h-6 hover:bg-[#383838]'/>
 									<label htmlFor='playlistPublic'>Show on my public profile</label>
 								</span>
 								<button

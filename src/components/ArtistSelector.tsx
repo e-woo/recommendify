@@ -59,11 +59,9 @@ const ArtistSelector = ( {index} : {index: number}) => {
 	}
 
 	return (selected ?
-		<div className='bg-[#262626] p-2 text-center text-md rounded-2xl select-none border-none w-full grid grid-cols-8'>
-			<div className='col-span-7'>
-				<ArtistCard artist={artist} onClick={() => {}}/>
-				<div id={'artist' + index} artist-id={artist.id}/>
-			</div>
+		<div className='bg-[#262626] p-2 text-center text-md rounded-2xl select-none border-none w-full'>
+			<ArtistCard artist={artist} onClick={() => {}}/>
+			<div id={'artist' + index} artist-id={artist.id}/>
 		</div> :
 		<div className='relative text-left text-sm'>
 			<input
