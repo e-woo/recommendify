@@ -45,15 +45,16 @@ const App = () => {
 
 		// compute seeds used to generate playlist
 		for (let i = 0; i < seeds.length; i++) {
-			if (seeds[i].type.name === 'GenreSelector') // genre seed
+			const seedElementName = seeds[i].type.name;
+			if (seedElementName === 'GenreSelector') // genre seed
 				genres.push((document.getElementById('genre' + seedIds[i])! as HTMLFormElement).value);
-			else if (seeds[i].type.name === 'ArtistSelector') { // artist seed
-				const a = document.getElementById('artist' + seedIds[i]);
-				if (a === null) { // if user has not entered in an artist yet
+			else if (seedElementName === 'ArtistSelector') { // artist seed
+				const artist = document.getElementById('artist' + seedIds[i]);
+				if (artist === null) { // if user has not entered in an artist yet
 					setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>Please enter your artist!</h4>);
 					return;
 				}
-				artists.push((a as HTMLDivElement).getAttribute('artist-ID') ?? '');
+				artists.push((artist as HTMLDivElement).getAttribute('artist-ID') ?? '');
 			}
 		}
 
@@ -72,7 +73,7 @@ const App = () => {
 		}
 	}
 
-	async function createPlaylist(profile: any, name: string, tracks: Array<any>) {
+	async function createPlaylist(profile: any, name: string, tracks: Track[]) {
 		const result = await create(profile, name, tracks, playlistPublic);
 		setPlaylistMessage('error' in result ? 
 		<h4 className='text-[#fa5050] text-lg'>An error occured while creating your playlist. Please refresh the page.</h4> :
@@ -231,7 +232,7 @@ const App = () => {
 						<h2 className='font-semibold text-2xl'>Tracks</h2>
 						<div className='rounded-lg text-white p-1 overflow-hidden bg-gradient-to-br from-primary-500 to-secondary-500'>
 							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg'>
-								<div className='overflow-auto overflow-y-scroll h-96 bg-[#181818] rounded-lg p-1'>
+								<div className='overflow-auto overflow-y-scroll h-96 rounded-lg p-1'>
 									<ul className='gap-2 w-72 xl:w-96'>
 										{tracks.map((track, index) => <li key={index}><TrackCard track={track}/></li>)}
 									</ul>

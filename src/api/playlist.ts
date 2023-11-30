@@ -1,13 +1,13 @@
 export interface Track {
 	uri: string;
 	name: string;
-	artists: Array<any>;
+	artists: any[];
 	image: string;
 }
 
-export async function getGenres(): Promise<Array<string>> {
+export async function getGenres(): Promise<string[]> {
 	const accessToken = sessionStorage.getItem('access_token');
-	const genres: Array<string> = JSON.parse(localStorage.getItem('genres')!);
+	const genres: string[] = JSON.parse(localStorage.getItem('genres')!);
 	if (genres)
 		return genres;
 	const result = await fetch('https://api.spotify.com/v1/recommendations/available-genre-seeds', {
@@ -56,10 +56,10 @@ export function filterTracks(data: any): Track[] {
 }
 
 
-export async function create(profile: any, name: string, tracks: Array<any>, playlistPublic: boolean) {
+export async function create(profile: any, name: string, tracks: Track[], playlistPublic: boolean) {
 	if (name === '')
 		name = 'Untitled Playlist';
-    const id = profile.id
+    const id = profile.id;
     const accessToken = sessionStorage.getItem('access_token');
 
 	// create playlist
