@@ -24,7 +24,7 @@ const ArtistSelector = ( {index} : {index: number}) => {
 			const result = await searchArtists(query);
 			console.log(result);
 
-			const resultArtists: Artist[] = []
+			const resultArtists: Artist[] = [];
 			result.artists.items.forEach((artist: any) => resultArtists.push({
 				name: artist.name,
 				id: artist.id,
@@ -71,10 +71,13 @@ const ArtistSelector = ( {index} : {index: number}) => {
 				onKeyUp={search}
 				className={`bg-[#262626] py-2 px-4 text-md ${showArtists ? 'rounded-t-2xl' : 'rounded-2xl'} select-none border-none focus:ring-primary-500 focus:ring-2 inline-block w-full`}/>
 			<ul className={`${showArtists ? '' : 'hidden'} absolute z-[10] block bg-[#202020] rounded-b-lg w-full overflow-y-auto max-h-64`}>
-				{artists.map((artist, index) =>
+				{artists.length > 0 ? artists.map((artist, index) =>
 				<li className='bg-[#202020] z-[100] text-md select-none hover:bg-[#383838] cursor-pointer py-2 w-full' key={index}>
 					<ArtistCard artist={artist} onClick={select}/>
-				</li>)}
+				</li>) :
+				<li className='bg-[#202020] z-[100] text-md select-none py-4 w-full text-center'>
+					<p className='text-slate-300'>No search results!</p>
+				</li>}
 			</ul>
 		</div>
 		

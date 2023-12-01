@@ -4,9 +4,10 @@ import './scrollbar.css';
 import { fetchProfile, getAccessToken, getRefreshToken, redirectToAuthCodeFlow } from './api/auth';
 import { create, getGenres, generate, Track, filterTracks } from './api/playlist';
 import ProfileCard from './components/ProfileCard';
-import TrackCard from './components/TrackCard';
+import PlaylistTrackCard from './components/PlaylistTrackCard';
 import GenreSelector from './components/GenreSelector';
 import ArtistSelector from './components/ArtistSelector';
+import TrackSelector from './components/TrackSelector';
 
 let seedId = 0;
 const App = () => {
@@ -42,6 +43,7 @@ const App = () => {
 		// seed arrays
 		const genres: string[] = [];
 		const artists: string[] = [];
+		const tracks: string[] = [];
 
 		// compute seeds used to generate playlist
 		for (let i = 0; i < seeds.length; i++) {
@@ -56,10 +58,18 @@ const App = () => {
 				}
 				artists.push((artist as HTMLDivElement).getAttribute('artist-ID') ?? '');
 			}
+			else if (seedElementName === 'TrackSelector') {
+				const track = document.getElementById('track' + seedIds[i]);
+				if (track === null) { // if user has not entered in a track yet
+					setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>Please enter your track!</h4>);
+					return;
+				}
+				tracks.push((track as HTMLDivElement).getAttribute('track-ID') ?? '');
+			}
 		}
 
 		// generate playlist
-		const result = await generate(genres.join('%2C'), artists.join('%2C'), trackCount, profile);
+		const result = await generate(genres.join('%2C'), artists.join('%2C'), tracks.join('%2C'), trackCount, profile);
 		setPlaylistMessage(<></>);
 
 		// error handling
@@ -190,7 +200,13 @@ const App = () => {
 														seedId++;
 													}}
 														className='bg-[#202020] text-center text-md select-none hover:bg-[#383838] cursor-pointer p-2'>Artist</div>
-													<div className='bg-[#202020] text-center text-md rounded-b-2xl select-none hover:bg-[#383838] cursor-pointer p-2'>Track</div>
+													<div onClick={() => {
+														setSeeds(seeds => [...seeds, <TrackSelector index={seedId} key={seedId}/>]);
+														setSeedIds(seedIds => [...seedIds, seedId]);
+														setGenerateMessage(<></>);
+														seedId++;
+													}}
+														className='bg-[#202020] text-center text-md rounded-b-2xl select-none hover:bg-[#383838] cursor-pointer p-2'>Track</div>
 												</div>
 											</div>
 											</div>
@@ -234,7 +250,7 @@ const App = () => {
 							<div className='bg-[#121212] flex flex-col p-4 gap-4 rounded-lg'>
 								<div className='overflow-auto overflow-y-scroll h-96 rounded-lg p-1'>
 									<ul className='gap-2 w-72 xl:w-96'>
-										{tracks.map((track, index) => <li key={index}><TrackCard track={track}/></li>)}
+										{tracks.map((track, index) => <li key={index}><PlaylistTrackCard track={track}/></li>)}
 									</ul>
 								</div>
 								<input type='text' className={`${tracks.length === 1 ? 'invisible' : 'visible'} bg-[#262626] py-2 px-4 rounded-xl border-none focus:ring-primary-500 focus:ring-2`} placeholder='Playlist Name...' id='playlistName'/>
