@@ -13,7 +13,7 @@ let seedId = 0;
 const App = () => {
 	const clientId = '';
 	const params = new URLSearchParams(window.location.search);
-	const code = params.get("code");
+	const code = params.get('code');
 	
 	const [trackCount, setTrackCount] = useState(50);
 	const [profile, setProfile] = useState({});
@@ -21,7 +21,7 @@ const App = () => {
 	const [loggedIn, setLoggedIn] = useState(false);
 	const [tracks, setTracks] = useState<Track[]>([]);
 	const [playlistPublic, setPlaylistPublic] = useState(false);
-	const [seeds, setSeeds] = useState<JSX.Element[]>([]);
+	const [seeds, setSeeds] = useState<React.JSX.Element[]>([]);
 	const [seedIds, setSeedIds] = useState<number[]>([]);
 
 	const [showSeedMenu, setShowSeedMenu] = useState(false);
@@ -96,11 +96,11 @@ const App = () => {
 		}
 
 		if (showSeedMenu) {
-			setTimeout(() => window.addEventListener("click", close), 50);
+			setTimeout(() => window.addEventListener('click', close), 50);
 		}
 
 		return function removeListener() {
-		  window.removeEventListener("click", close);
+		  window.removeEventListener('click', close);
 		}
 	}, [showSeedMenu]);
 	
@@ -118,11 +118,9 @@ const App = () => {
 			// if refresh token is bad, the user will need to reauthorize, so clear local storage
 			else if (refreshToken === 'undefined' || refreshToken === null) {
 				setLoggedIn(false);
-				setLoginErrorMessage(<h4 className='text-[#fa5050] text-lg'>An error occured with authroization. Please log in to Spotify again.</h4>);
-				localStorage.removeItem('profile');
-				localStorage.removeItem('refresh_token');
-				localStorage.removeItem('verifier');
-				sessionStorage.removeItem('access_token')
+				setLoginErrorMessage(<h4 className='text-[#fa5050] text-lg'>An error occured with authorization. Please log in to Spotify again.</h4>);
+				localStorage.clear();
+				sessionStorage.clear();
 			}
 
 			// get token using refresh token

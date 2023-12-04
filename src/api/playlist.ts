@@ -21,22 +21,8 @@ export async function getGenres(): Promise<string[]> {
 	return response.genres;
 }
 
-export async function generate(genres: string, artists: string, tracks: string, trackCount: number, profile: any) {// : Promise<Track[]> {
+export async function generate(genres: string, artists: string, tracks: string, trackCount: number, profile: any): Promise<any> {
 	const accessToken = sessionStorage.getItem('access_token');
-	/* // TOP ARTIST SEEDING
-	const topArtistsResult = await fetch('https://api.spotify.com/v1/me/top/artists?limit=4', {
-		headers: {
-			'Authorization': `Bearer ${accessToken}`
-		}
-	}).then(response => response.json()).then(data => {return data});
-	const artists: string[] = [];
-	topArtistsResult.items.map((artist: any) => artists.push(artist.id));
-	const artistString = artists.join('%2C');
-	*/
-	console.log('Genre string: ' + genres);
-	console.log('Artist string: ' + artists);
-	console.log('Track string: ' + tracks);
-	
 	return await fetch(`https://api.spotify.com/v1/recommendations?limit=${trackCount}&market=${profile.country}&seed_genres=${genres}&seed_artists=${artists}&seed_tracks=${tracks}`, {
         method: 'GET',
 		headers: {
@@ -57,7 +43,7 @@ export function filterTracks(data: any): Track[] {
 }
 
 
-export async function create(profile: any, name: string, tracks: Track[], playlistPublic: boolean) {
+export async function create(profile: any, name: string, tracks: Track[], playlistPublic: boolean): Promise<any> {
 	if (name === '')
 		name = 'Untitled Playlist';
     const id = profile.id;
@@ -65,7 +51,7 @@ export async function create(profile: any, name: string, tracks: Track[], playli
 
 	// create playlist
     const playlistId = await fetch(`https://api.spotify.com/v1/users/${id}/playlists`, {
-        method: "POST",
+        method: 'POST',
         headers: { 
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json'

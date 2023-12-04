@@ -4,7 +4,7 @@ import ArtistCard from './ArtistCard';
 
 const ArtistSelector = ( {index} : {index: number}) => {
 	const [showArtists, setShowArtists] = useState(false);
-	const [artists, setArtists] = useState<Array<Artist>>([]);
+	const [artists, setArtists] = useState<Artist[]>([]);
 	const [selected, setSelected] = useState(false);
 	const [artist, setArtist] = useState<Artist>( {
 		name: '',
@@ -22,7 +22,6 @@ const ArtistSelector = ( {index} : {index: number}) => {
 				return;
 
 			const result = await searchArtists(query);
-			console.log(result);
 
 			const resultArtists: Artist[] = [];
 			result.artists.items.forEach((artist: any) => resultArtists.push({
@@ -32,7 +31,6 @@ const ArtistSelector = ( {index} : {index: number}) => {
 				image: artist.images[0] ? artist.images[0].url : ''
 			}));
 
-			console.log(resultArtists);
 			setArtists(resultArtists);
 			setShowArtists(true);
 		}, 1000);
@@ -53,7 +51,6 @@ const ArtistSelector = ( {index} : {index: number}) => {
 	}, [showArtists]);
 
 	function select(artist: Artist) {
-		console.log(artist.name)
 		setArtist(artist);
 		setSelected(true);
 	}
@@ -80,7 +77,6 @@ const ArtistSelector = ( {index} : {index: number}) => {
 				</li>}
 			</ul>
 		</div>
-		
 	)
 }
 
