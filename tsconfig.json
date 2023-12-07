@@ -20,7 +20,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "types": [
-      "vite-plugin-terminal/client"
+      "vite-plugin-terminal/client",
+      "node"
     ],
     "esModuleInterop": true,
   },

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { searchTracks } from '../api/search';
 import TrackCard from './TrackCard';
 
+/* Track selector component allowing for the user to search and select track seeds */
 const TrackSelector = ( {index} : {index: number}) => {
 	const [showTracks, setShowTracks] = useState(false);
 	const [tracks, setTracks] = useState<Array<Track>>([]);
@@ -13,7 +14,7 @@ const TrackSelector = ( {index} : {index: number}) => {
 		image: ''
 	}); 
 
-	var delay: number;
+	var delay: NodeJS.Timeout;
 	function search() {
 		clearTimeout(delay);
 		delay = setTimeout(async () => {

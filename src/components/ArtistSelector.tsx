@@ -13,7 +13,7 @@ const ArtistSelector = ( {index} : {index: number}) => {
 		image: ''
 	}); 
 
-	var delay: number;
+	var delay: NodeJS.Timeout;
 	function search() {
 		clearTimeout(delay);
 		delay = setTimeout(async () => {
