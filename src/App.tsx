@@ -104,6 +104,7 @@ const App = () => {
 			if (code) {
 				await getAccessToken(clientId, code);
 				setLoggedIn(true);
+				localStorage.removeItem('profile');
 				document.location = '/'
 			}
 
