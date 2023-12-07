@@ -109,7 +109,7 @@ const App = () => {
 			}
 
 			// if refresh token is bad, the user will need to reauthorize, so clear local storage
-			else if (refreshToken === 'undefined' || refreshToken === null) {
+			else if (refreshToken === 'undefined') {
 				setLoggedIn(false);
 				setLoginErrorMessage(<h4 className='text-[#fa5050] text-lg'>An error occured with authorization. Please log in to Spotify again.</h4>);
 				localStorage.clear();
