@@ -22,7 +22,7 @@ const App = () => {
 	const [tracks, setTracks] = useState<Track[]>([]);
 	const [playlistPublic, setPlaylistPublic] = useState(false);
 	const [seeds, setSeeds] = useState<React.JSX.Element[]>([]);
-	const [seedIds, setSeedIds] = useState<number[]>([]);
+	const [seedIds, setSeedIds] = useState<string[]>([]);
 
 	const [showSeedMenu, setShowSeedMenu] = useState(false);
 
@@ -47,25 +47,17 @@ const App = () => {
 
 		// compute seeds used to generate playlist
 		for (let i = 0; i < seeds.length; i++) {
-			const seedElementName = seeds[i].type.name;
-			if (seedElementName === 'GenreSelector') // genre seed
-				genres.push((document.getElementById('genre' + seedIds[i])! as HTMLFormElement).value);
-			else if (seedElementName === 'ArtistSelector') { // artist seed
-				const artist = document.getElementById('artist' + seedIds[i]);
-				if (artist === null) { // if user has not entered in an artist yet
-					setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>Please enter your artist!</h4>);
-					return;
-				}
-				artists.push((artist as HTMLDivElement).getAttribute('artist-ID') ?? '');
+			const element = document.getElementById(seedIds[i]);
+			if (!element) { // if user has not entered in one of the searchable elements yet
+				setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>Please enter your {seedIds[i].includes('artist') ? 'artist' : 'track'}!</h4>);
+				return;
 			}
-			else if (seedElementName === 'TrackSelector') {
-				const track = document.getElementById('track' + seedIds[i]);
-				if (track === null) { // if user has not entered in a track yet
-					setGenerateMessage(<h4 className='text-[#fa5050] text-lg'>Please enter your track!</h4>);
-					return;
-				}
-				tracks.push((track as HTMLDivElement).getAttribute('track-ID') ?? '');
-			}
+			if (seedIds[i].includes('genre')) // genre seed
+				genres.push((element as HTMLFormElement).value);
+			else if (seedIds[i].includes('artist')) // artist seed
+				artists.push((element as HTMLDivElement).getAttribute('artist-ID') ?? '');
+			else if (seedIds[i].includes('track')) // track seed
+				tracks.push((element as HTMLDivElement).getAttribute('track-ID') ?? '');
 		}
 
 		// generate playlist
@@ -186,21 +178,21 @@ const App = () => {
 												<div className='absolute w-full z-[10] block bg-[#202020] rounded-b-2xl'>
 													<div onClick={() => {
 														setSeeds(seeds => [...seeds, <GenreSelector genres={genres} index={seedId} key={seedId}/>]);
-														setSeedIds(seedIds => [...seedIds, seedId]);
+														setSeedIds(seedIds => [...seedIds, 'genre' + seedId]);
 														setGenerateMessage(<></>);
 														seedId++;
 													}}
 														className='bg-[#202020] text-center text-md select-none hover:bg-[#383838] cursor-pointer p-2'>Genre</div>
 													<div onClick={() => {
 														setSeeds(seeds => [...seeds, <ArtistSelector index={seedId} key={seedId}/>]);
-														setSeedIds(seedIds => [...seedIds, seedId]);
+														setSeedIds(seedIds => [...seedIds, 'artist' + seedId]);
 														setGenerateMessage(<></>);
 														seedId++;
 													}}
 														className='bg-[#202020] text-center text-md select-none hover:bg-[#383838] cursor-pointer p-2'>Artist</div>
 													<div onClick={() => {
 														setSeeds(seeds => [...seeds, <TrackSelector index={seedId} key={seedId}/>]);
-														setSeedIds(seedIds => [...seedIds, seedId]);
+														setSeedIds(seedIds => [...seedIds, 'track' + seedId]);
 														setGenerateMessage(<></>);
 														seedId++;
 													}}
