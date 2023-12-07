@@ -11,7 +11,7 @@ import TrackSelector from './components/TrackSelector';
 
 let seedId = 0;
 const App = () => {
-	const clientId = process.env.REACT_APP_CLIENT_ID || '';
+	const clientId = '0719751243924db38335529b3923e06c';
 	const params = new URLSearchParams(window.location.search);
 	const code = params.get('code');
 	
