@@ -1,27 +1,13 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Recommendify
 
-Currently, two official plugins are available:
+Recommendify is a web application that utilizes Spotify's recommendations API to generate playlists based on user selected seeds, consisting of genres, artists and tracks. Generated playlists can be saved to a user's Spotify account.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Usage
 
-## Expanding the ESLint configuration
+Authorize recommendify by logging in with your Spotify account. Then, on the main generator page, add up to 5 seeds, consisting of genres, artists or tracks in any combination you like. Then, hit the generate button to generate a playlist using those seeds. You can regenerate the playlist as many times as you like, but do keep in mind that too many generations may result in the web app getting rate limited!
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+If you generate a playlist that you would like to save, click on the "Add To My Profile" button. Additionally, you can check the "Show on my public profile" checkbox if you would like to add this playlist to your public profile.
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Seeds
+Seeds consist of genres, artists, and tracks. Genres are fetched via Spotify's API, while artist and tracks allow you to enter a search query. Recommendify will return search results from Spotify's API using your search query.
