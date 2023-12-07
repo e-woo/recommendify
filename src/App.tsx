@@ -281,7 +281,7 @@ const App = () => {
 				</div>
 			</> : // Logged out
 			<div className='font-poppins fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col gap-4 justify-center place-items-center'>
-				<h1 className='text-5xl md:text-7xl font-bold mb-4'>Playlist Generator</h1>
+				<h1 className='text-5xl md:text-7xl font-bold mb-4 bg-clip-text bg-gradient-to-br from-primary-500 to-secondary-500 text-transparent'>Reccomendify</h1>
 				{Object.keys(profile).length !== 0 ? 
 					<>
 						<h3 className='text-2xl md:text-4xl font-medium mb-4'>Welcome back, {(profile as any).display_name}!</h3>
