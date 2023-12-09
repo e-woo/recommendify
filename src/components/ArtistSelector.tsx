@@ -10,7 +10,8 @@ const ArtistSelector = ( {index} : {index: number}) => {
 		name: '',
 		id: '',
 		followers: -1,
-		image: ''
+		image: '',
+		url: ''
 	}); 
 
 	var delay: NodeJS.Timeout;
@@ -28,7 +29,8 @@ const ArtistSelector = ( {index} : {index: number}) => {
 				name: artist.name,
 				id: artist.id,
 				followers: artist.followers.total,
-				image: artist.images[0] ? artist.images[0].url : ''
+				image: artist.images[0] ? artist.images[0].url : '',
+				url: artist.external_urls.spotify
 			}));
 
 			setArtists(resultArtists);
@@ -85,6 +87,7 @@ export interface Artist {
 	id: string;
 	followers: number;
 	image: string;
+	url: string;
 }
 
 export default ArtistSelector;

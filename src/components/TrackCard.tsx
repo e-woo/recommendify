@@ -2,7 +2,7 @@ import { Track } from './TrackSelector';
 
 const ArtistCard = ({ track, onClick } : {track: Track, onClick: Function}) => {
 	return (
-		<div className='grid grid-cols-4 gap-2 px-2' onClick={() => onClick(track)}>
+		<div className='grid grid-cols-5 gap-2 px-2' onClick={() => onClick(track)}>
 			<img src={track.image} className='col-span-1 place-self-center'/>
 			<div className='col-span-3'>
 				<h5 className='text-white'>{track.name}</h5>
@@ -12,6 +12,9 @@ const ArtistCard = ({ track, onClick } : {track: Track, onClick: Function}) => {
 				}
 				</p>
 			</div>
+			<a href={track.url} target='_blank' className='col-span-1 flex justify-center items-center'>
+				<i className='bx bxl-spotify text-2xl'/>
+			</a>
 		</div>
 	)
 }

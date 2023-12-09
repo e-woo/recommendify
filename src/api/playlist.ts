@@ -3,6 +3,7 @@ export interface Track {
 	name: string;
 	artists: any[];
 	image: string;
+	url: string;
 }
 
 export async function getGenres(): Promise<string[]> {
@@ -37,7 +38,8 @@ export function filterTracks(data: any): Track[] {
 		uri: track.uri, // string
 		name: track.name, // string
 		artists: track.artists, // array
-		image: track.album.images[0].url // string
+		image: track.album.images[0].url, // string
+		url: track.external_urls.spotify // string
 	})})
 	return tracks;
 }

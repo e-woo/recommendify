@@ -2,7 +2,7 @@ import { Artist } from './ArtistSelector';
 
 const ArtistCard = ({ artist, onClick } : {artist: Artist, onClick: Function}) => {
 	return (
-		<div className='grid grid-cols-4 gap-2 px-2' onClick={() => onClick(artist)}>
+		<div className='grid grid-cols-5 gap-2 px-2' onClick={() => onClick(artist)}>
 			{artist.image ? 
 				// artist image
 				<img src={artist.image} className='col-span-1 place-self-center'/> :
@@ -19,6 +19,9 @@ const ArtistCard = ({ artist, onClick } : {artist: Artist, onClick: Function}) =
 					}).format(artist.followers) + ' followers'}
 				</p>
 			</div>
+			<a href={artist.url} target='_blank' className='col-span-1 flex justify-center items-center'>
+				<i className='bx bxl-spotify text-2xl'/>
+			</a>
 		</div>
 	)
 }

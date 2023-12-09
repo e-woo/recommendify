@@ -11,7 +11,8 @@ const TrackSelector = ( {index} : {index: number}) => {
 		name: '',
 		id: '',
 		artists: [],
-		image: ''
+		image: '',
+		url: ''
 	}); 
 
 	var delay: NodeJS.Timeout;
@@ -23,17 +24,16 @@ const TrackSelector = ( {index} : {index: number}) => {
 				return;
 
 			const result = await searchTracks(query);
-			console.log(result);
 
 			const resultTracks: Track[] = []
 			result.tracks.items.forEach((track: any) => resultTracks.push({
 				name: track.name,
 				id: track.id,
 				artists: track.artists.map((artist: any) => artist.name),
-				image: track.album.images[0].url
+				image: track.album.images[0].url,
+				url: track.external_urls.spotify
 			}));
 
-			console.log(resultTracks);
             setTracks(resultTracks);
             setShowTracks(true);
 		}, 1000);
@@ -89,6 +89,7 @@ export interface Track {
 	id: string;
 	artists: string[];
 	image: string;
+	url: string;
 }
 
 export default TrackSelector;
