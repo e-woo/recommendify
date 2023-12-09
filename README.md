@@ -1,5 +1,5 @@
 ## NOTE
-Due to the limitations of a Spotify developer app, this web app will only work for whitelisted people for now. If you would like to try this web app, 
+Due to the limitations of a Spotify developer app, this web app will only work for whitelisted people for now. If you would like to try this web app, contact me at ethanwoo.vercel.app
 
 # Recommendify
 

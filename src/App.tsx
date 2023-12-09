@@ -135,7 +135,7 @@ const App = () => {
 				setGenres(await getGenres());
 			}
 			// load profile from local storage
-			else if (!('error' in JSON.parse(localStorage.getItem('profile')!)))
+			else if (localStorage.getItem('profile') && !('error' in JSON.parse(localStorage.getItem('profile')!)))
 				setProfile(JSON.parse(localStorage.getItem('profile')!));
 		}
 		f();
