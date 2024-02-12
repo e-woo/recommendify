@@ -1,6 +1,3 @@
-## IMPORTANT NOTE
-Due to the limitations of a Spotify developer app, this web app will only work for whitelisted people for now. If you would like to try this web app, contact me at https://ethanwoo.vercel.app.
-
 # Recommendify
 
 Recommendify is a web application that utilizes Spotify's recommendations API to generate playlists based on user selected seeds, consisting of genres, artists and tracks. Generated playlists can be saved to a user's Spotify account.
